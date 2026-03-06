@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
 import joblib
-from src.threat_engine import threat_level
+from sklearn.preprocessing import LabelEncoder
 
-st.set_page_config(layout="wide")
-
-st.title("🛡 Cyber Threat Detection System")
+st.title("Cyber Threat Detection System")
 
 model = joblib.load("models/cyber_model.pkl")
 
@@ -15,16 +13,18 @@ if uploaded_file:
 
     df = pd.read_csv(uploaded_file)
 
+    # Encode categorical columns
+    encoder = LabelEncoder()
+
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = encoder.fit_transform(df[col])
+
     predictions = model.predict(df)
 
-    df["prediction"] = predictions
+    df["Prediction"] = predictions
 
-    df["severity"] = df["prediction"].apply(threat_level)
-
-    st.subheader("Detection Results")
-
+    st.write("Detection Results")
     st.dataframe(df)
 
-    st.subheader("Threat Distribution")
-
-    st.bar_chart(df["severity"].value_counts())
+    st.bar_chart(df["Prediction"].value_counts())
