@@ -1,23 +1,18 @@
 import pandas as pd
-import joblib
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+import joblib
 
-df = pd.read_csv("../dataset/train_dataset.csv")
+print("Loading Dataset...")
 
-encoder = LabelEncoder()
+df = pd.read_csv("data/train_dataset.csv")
 
-for col in df.columns:
-    if df[col].dtype == "object":
-        df[col] = encoder.fit_transform(df[col])
+X = df.drop("label", axis=1)
+y = df["label"]
 
-X = df.iloc[:, :-1]
-y = df.iloc[:, -1]
-
-model = RandomForestClassifier(n_estimators=200)
+model = RandomForestClassifier()
 
 model.fit(X, y)
 
-joblib.dump(model, "../models/cyber_model.pkl")
+joblib.dump(model, "model/cyber_model.pkl")
 
-print("Model trained successfully")
+print("Model Saved")
